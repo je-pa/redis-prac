@@ -188,6 +188,45 @@ public class RedisCommon {
         template.opsForList().remove(key, 1, jsonValue);
     }
 
+    /**
+     * hash add
+     * @param key
+     * @param field
+     * @param value
+     * @param <T>
+     */
+    public <T> void putInHash(String key, String field, T value) {
+        String jsonValue = gson.toJson(value);
+        template.opsForHash().put(key, field, jsonValue);
+    }
+
+    /**
+     * hash field get
+     * @param key
+     * @param field
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> T getFromHash(String key, String field, Class<T> clazz) {
+        Object result  = template.opsForHash().get(key, field);
+
+        if (result != null) {
+//            return clazz.cast(result);
+            return gson.fromJson(result.toString(), clazz);
+        }
+
+        return null;
+    }
+
+    /**
+     * hash field 삭제
+     * @param key
+     * @param field
+     */
+    public void removeFromHash(String key, String field) {
+        template.opsForHash().delete(key, field);
+    }
 
 }
 
