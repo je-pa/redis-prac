@@ -133,6 +133,60 @@ public class RedisCommon {
         return resultSet;
     }
 
+    /**
+     * list 타입 add left
+     * @param key
+     * @param value
+     * @param <T>
+     */
+    public <T> void addToListLeft(String key, T value) {
+        String jsonValue = gson.toJson(value);
+        template.opsForList().leftPush(key, jsonValue);
+    }
+
+    /**
+     * list 타입 add right
+     * @param key
+     * @param value
+     * @param <T>
+     */
+    public <T> void addToListRight(String key, T value) {
+        String jsonValue = gson.toJson(value);
+        template.opsForList().rightPush(key, jsonValue);
+    }
+
+    /**
+     * list 타입 전체 조회
+     * @param key
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> List<T> getAllList(String key, Class<T> clazz) {
+        List<String> jsonValues = template.opsForList().range(key, 0, -1);
+        List<T> reusltSet = new ArrayList<>();
+
+
+        if (jsonValues != null) {
+            for (String jsonValue : jsonValues) {
+                T value = gson.fromJson(jsonValue, clazz);
+                reusltSet.add(value);
+            }
+        }
+
+        return reusltSet;
+    }
+
+    /**
+     * list 타입 value remove
+     * @param key
+     * @param value
+     * @param <T>
+     */
+    public <T> void removeFromList(String key, T value) {
+        String jsonValue = gson.toJson(value);
+        template.opsForList().remove(key, 1, jsonValue);
+    }
 
 
 }
