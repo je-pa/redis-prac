@@ -1,1 +1,9 @@
-spring.application.name=redis-prac
+server.port: 7002
+spring:
+  redis:
+    default-time: 5m # ?? ?? ??
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6380
+      password: root
