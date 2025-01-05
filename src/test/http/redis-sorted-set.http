@@ -1,0 +1,22 @@
+### add sorted set
+POST http://localhost:7002/api/v1/sorted-set/sorted-set-collection
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "my-sorted-set"
+  },
+  "name": "three",
+  "score": 30
+}
+
+### get sorted set(min ~ max)
+GET http://localhost:7002/api/v1/sorted-set/get-sorted-set-by-range?
+    key=my-sorted-set&
+    min=10&
+    max=30
+
+### get sorted set(top n)
+GET http://localhost:7002/api/v1/sorted-set/get-sorted-set-by-top?
+    key=my-sorted-set&
+    n=2
