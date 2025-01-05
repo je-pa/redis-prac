@@ -1,0 +1,25 @@
+###
+POST http://localhost:7002/api/v1/list/list-add-left
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "my_list"
+  },
+  "Name": "left"
+}
+
+###
+POST http://localhost:7002/api/v1/list/list-add-right
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "my_list"
+  },
+  "Name": "right"
+}
+
+###
+GET http://localhost:7002/api/v1/list/all?
+    key=my_list
