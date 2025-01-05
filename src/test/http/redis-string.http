@@ -1,0 +1,25 @@
+###
+POST http://localhost:7002/api/v1/set/set-string-collection
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "test_one"
+  },
+  "name": "park"
+}
+
+###
+GET http://localhost:7002/api/v1/set/get-string-collection?
+    key=test_one
+
+###
+POST http://localhost:7002/api/v1/set/multi-set-collection
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "test_one"
+  },
+  "names": ["Park", "Ji"]
+}
