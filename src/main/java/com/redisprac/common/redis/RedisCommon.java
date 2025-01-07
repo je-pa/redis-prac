@@ -4,8 +4,10 @@
 package com.redisprac.common.redis;
 
 import com.google.gson.Gson;
+import com.redisprac.domain.strategy.model.ValueWithTtl;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +16,13 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -235,6 +243,73 @@ public class RedisCommon {
 
     public boolean getBit(String key, long offset) {
         return template.opsForValue().getBit(key, offset);
+    }
+
+    /**
+     * Pipeline - Atomic 보장 안됨
+     * @param key
+     * @param clazz
+     * @return
+     * @param <T>
+     */
+    public <T> ValueWithTtl<T> getValueWithTtl(String key, Class<T> clazz) {
+        T value = null;
+        Long ttl = null;
+
+        try {
+            List<Object> results = template.executePipelined(new RedisCallback<Object>() {
+                // 해당 내부에서 파이프라인을 작성
+                @Override
+                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                    StringRedisConnection conn = (StringRedisConnection) connection;
+                    conn.get(key);
+                    conn.ttl(key);
+
+                    return null;
+                }
+            });
+
+            value = (T) gson.fromJson((String) results.get(0), clazz);
+            ttl = (Long) results.get(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ValueWithTtl<T>(value, ttl);
+    }
+
+    /**
+     * LuaScript - Atomic 보장
+     * @param key1
+     * @param key2
+     * @param resultKey
+     * @return
+     */
+    public Long sumTwoKeyAndRenew(String key1, String key2, String resultKey) {
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+
+        redisScript.setLocation(new ClassPathResource("/lua/newKey.lua"));
+        redisScript.setResultType(Long.class);
+
+        List<String> keys = Arrays.asList(key1, key2, resultKey);
+
+        return template.execute(redisScript, keys);
+    }
+
+    public Long sumTwoKeyAndRenew(String script, String key1, String key2, String resultKey) {
+        return template.execute((RedisCallback<Long>) connection -> {
+           byte[] scriptBytes = script.getBytes();
+           byte[] key1Bytes = key1.getBytes();
+           byte[] key2Bytes = key2.getBytes();
+           byte[] resultKeyBytes = resultKey.getBytes();
+
+           return (Long) connection.execute("EVAL",
+               scriptBytes,
+               key1Bytes,
+               key2Bytes,
+               resultKeyBytes
+               );
+        });
     }
 }
 

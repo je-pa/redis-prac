@@ -1,0 +1,7 @@
+
+### lua 더하기
+GET http://localhost:7002/api/v1/strategy/lua-script?
+    key1=number_one&
+    key2=number_two&
+    newKey=new_number
+
