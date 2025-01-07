@@ -4,7 +4,10 @@ import com.redisprac.common.redis.RedisCommon;
 import com.redisprac.domain.strategy.model.ValueWithTtl;
 import com.redisprac.domain.string.model.StringModel;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,26 @@ import org.springframework.stereotype.Service;
 public class RedisStrategy {
 
   final private RedisCommon redis;
+  final private RedissonClient redissonClient;
+
+  /**
+   * 락을 이용한 순차 보장하는 메서드 메서드
+   */
+  public void lockSample() {
+    RLock lock = redissonClient.getLock("sample");
+
+    try {
+      boolean isLocked = lock.tryLock(10, 60, TimeUnit.SECONDS);
+
+      if (isLocked) {
+
+      }
+    } catch (InterruptedException e) {
+
+    }
+
+    lock.unlock();
+  }
 
 
   /**
