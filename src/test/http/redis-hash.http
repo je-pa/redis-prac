@@ -1,0 +1,15 @@
+### put hashes
+POST http://localhost:7002/api/v1/hash/put-hashes
+Content-Type: application/json
+
+{
+  "baseRequest": {
+    "key": "my-hashes"
+  },
+  "field": "field1",
+  "name": "park"
+}
+### get hash value
+GET http://localhost:7002/api/v1/hash/get-hash-value?
+    key=my-hashes&
+    field=field1
