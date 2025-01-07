@@ -228,5 +228,13 @@ public class RedisCommon {
         template.opsForHash().delete(key, field);
     }
 
+
+    public void setBit(String key, long offset, boolean value) {
+        template.opsForValue().setBit(key, offset, value);
+    }
+
+    public boolean getBit(String key, long offset) {
+        return template.opsForValue().getBit(key, offset);
+    }
 }
 
