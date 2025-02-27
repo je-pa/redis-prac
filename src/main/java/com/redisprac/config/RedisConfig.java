@@ -1,5 +1,6 @@
 package com.redisprac.config;
 
+import com.redisprac.domain.dto.ItemDto;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -12,6 +13,7 @@ import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -66,6 +68,17 @@ public class RedisConfig {
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
         
         return redisTemplate;
-    }  
+    }
+
+    @Bean
+    public RedisTemplate<String, ItemDto> itemRedisTemplate(
+        RedisConnectionFactory connectionFactory
+    ) {
+        RedisTemplate<String, ItemDto> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(RedisSerializer.string());
+        template.setValueSerializer(RedisSerializer.json());
+        return template;
+    }
 
 }
